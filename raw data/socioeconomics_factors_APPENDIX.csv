@@ -1,0 +1,42 @@
+Indicators,year,ind_description,ind_unit
+Ind_01_01,2019,Population - Residents,in persons
+Ind_01_02,2010/2019,Population - Change in %,%
+Ind_01_03,2019,Population - Population density,Inhabitants per km² of total area
+Ind_01_04,2019,Population - Share of age group 0-19 years,%
+Ind_01_05,2019,Population - Share of age group 20-64 years,%
+Ind_01_06,2019,Population - Share of age group 65+ years,%
+Ind_01_08,2019,Population - Foreign nationals,%
+Ind_01_09,2019,Population - Crude marriage rate,‰
+Ind_01_10,2019,Population - Crude divorce rate,‰
+Ind_01_11,2019,Population - Crude birth rate,‰
+Ind_01_12,2019,Population - Crude mortality rate,‰
+Ind_01_13,2019,Population - Private households,Absolute number
+Ind_01_14,2019,Population - Size of households,in persons
+Ind_04_01,2016,"Area - Area, total",in m²
+Ind_04_02,2004/2009,Area - Settlement and urban area,%
+Ind_04_03,1979/1985,"Area - Settlement and urban area, change",in ha
+Ind_04_04,2004/2009,Area - Agricultural area,%
+Ind_04_05,1979/1985,"Area - Agricultural area, change",in ha
+Ind_04_06,2004/2009,Area - Wooded area,%
+Ind_04_07,2004/2009,Area - Unproductive area,%
+Ind_06_03,2018,"Economy - Employed, total",Absolute number
+Ind_06_04,2018,"Economy - Employed, primary sector",Absolute number
+Ind_06_05,2018,"Economy - Employed, secondary sector",Absolute number
+Ind_06_06,2018,"Economy - Employed, tertiary sector",Absolute number
+Ind_06_07,2018,"Economy - Business establishments, total",Business establishments
+Ind_06_08,2018,"Economy - Business establishments, primary sector",Business establishments
+Ind_06_09,2018,"Economy - Business establishments, secondary sector",Business establishments
+Ind_06_10,2018,"Economy - Business establishments, tertiary sector",Business establishments
+Ind_08_01,2020,Construction and housing - Dwelling vacancy rate,%
+Ind_08_04,2018,Construction and housing - New housing units,per 1000 residents
+Ind_11_01,2019,Social security - Social assistance rate,%
+Ind_14_01,2019,Voter shares of selected parties (National Council elections) - FDP/PLR,%
+Ind_14_02,2019,Voter shares of selected parties (National Council elections) - CVP,%
+Ind_14_03,2019,Voter shares of selected parties (National Council elections) - SP,%
+Ind_14_04,2019,Voter shares of selected parties (National Council elections) - SVP,%
+Ind_14_05,2019,Voter shares of selected parties (National Council elections) - EVP/CSP,%
+Ind_14_06,2019,Voter shares of selected parties (National Council elections) - GLP,%
+Ind_14_07,2019,Voter shares of selected parties (National Council elections) - BDP,%
+Ind_14_08,2019,Voter shares of selected parties (National Council elections) - PdA/Sol.,%
+Ind_14_09,2019,Voter shares of selected parties (National Council elections) - GPS,%
+Ind_14_10,2019,Voter shares of selected parties (National Council elections) - Small right-wing parties,%
