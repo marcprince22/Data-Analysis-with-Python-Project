@@ -1,0 +1,25 @@
+"mutationsdatum","mutationstyp","gemeinde_code_alt","gemeinde_name_alt","gemeinde_code_neu","gemeinde_name_neu","eltern_gebietstyp_code","eltern_gebietstyp_name","eltern_gebiet_code_alt","eltern_gebiet_name_alt","eltern_gebiet_code_neu","eltern_gebiet_name_neu"
+2018-01-01,"Fusion",222,"Hofstetten (ZH)",294,"Elgg",NA,NA,NA,NA,NA,NA
+2019-01-01,"Fusion",36,"Oberstammheim",292,"Stammheim",NA,NA,NA,NA,NA,NA
+2023-01-01,"Fusion",21,"Adlikon",291,"Andelfingen",NA,NA,NA,NA,NA,NA
+2023-01-01,"Fusion",32,"Humlikon",291,"Andelfingen",NA,NA,NA,NA,NA,NA
+2018-01-01,"Fusion",132,"Hirzel",295,"Horgen",NA,NA,NA,NA,NA,NA
+2018-01-01,"Fusion",133,"Horgen",295,"Horgen",NA,NA,NA,NA,NA,NA
+2018-01-01,"Fusion",217,"Elgg",294,"Elgg",NA,NA,NA,NA,NA,NA
+2016-01-01,"Fusion",174,"Illnau-Effretikon",296,"Illnau-Effretikon",NA,NA,NA,NA,NA,NA
+2023-01-01,"Fusion",30,"Andelfingen",291,"Andelfingen",NA,NA,NA,NA,NA,NA
+2019-01-01,"Fusion",42,"Unterstammheim",292,"Stammheim",NA,NA,NA,NA,NA,NA
+2019-01-01,"Fusion",140,"Schönenberg (ZH)",293,"Wädenswil",NA,NA,NA,NA,NA,NA
+2019-01-01,"Fusion",134,"Hütten",293,"Wädenswil",NA,NA,NA,NA,NA,NA
+2019-01-01,"Fusion",142,"Wädenswil",293,"Wädenswil",NA,NA,NA,NA,NA,NA
+2014-01-01,"Fusion",229,"Wiesendangen",298,"Wiesendangen",NA,NA,NA,NA,NA,NA
+2015-01-01,"Fusion",179,"Sternenberg",297,"Bauma",NA,NA,NA,NA,NA,NA
+2016-01-01,"Fusion",175,"Kyburg",296,"Illnau-Effretikon",NA,NA,NA,NA,NA,NA
+2019-01-01,"Fusion",44,"Waltalingen",292,"Stammheim",NA,NA,NA,NA,NA,NA
+2015-01-01,"Fusion",171,"Bauma",297,"Bauma",NA,NA,NA,NA,NA,NA
+2014-01-01,"Fusion",212,"Bertschikon",298,"Wiesendangen",NA,NA,NA,NA,NA,NA
+2003-01-01,"Namensänderung",222,"Hofstetten bei Elgg",222,"Hofstetten (ZH)",NA,NA,NA,NA,NA,NA
+2003-01-01,"Namensänderung",241,"Aesch bei Birmensdorf",241,"Aesch (ZH)",NA,NA,NA,NA,NA,NA
+1999-01-01,"Namensänderung",226,"Schlatt",226,"Schlatt (ZH)",NA,NA,NA,NA,NA,NA
+2013-01-01,"Gebietszuweisungsänderung",194,"Greifensee",194,"Greifensee",6,"Raumplanungsregion",108,"Zürcher Oberland",102,"Glattal"
+2009-01-01,"Gebietszuweisungsänderung",211,"Altikon",211,"Altikon",6,"Raumplanungsregion",110,"Weinland",109,"Winterthur und Umgebung"
