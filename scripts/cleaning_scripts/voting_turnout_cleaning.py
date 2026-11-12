@@ -113,19 +113,21 @@ def add_canton_column(chunk, current_canton):
 
 
 def main():
+    """
     preview = pd.read_csv(TURNOUT_FILE, encoding="cp1252", sep=";", nrows=5)
     print(preview.columns.tolist())
     print(preview.to_string(index=False))
+    """
 
-
-"""
     municipality_lookup = load_municipality_lookup()
     current_canton = None
     unmatched_names = set()
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    with pd.read_csv(TURNOUT_FILE, chunksize=100_000) as reader:
+    with pd.read_csv(
+        TURNOUT_FILE, sep=";", encoding="cp1252", chunksize=100_000
+    ) as reader:
         for chunk_number, chunk in enumerate(reader):
             chunk = add_geography_columns(chunk, municipality_lookup)
             chunk, current_canton = add_canton_column(chunk, current_canton)
@@ -149,7 +151,7 @@ def main():
     print(f"Distinct municipality names without a BFS code: {len(unmatched_names)}")
     for name in sorted(unmatched_names):
         print(f"  {name}")
-"""
+
 
 if __name__ == "__main__":
     main()
