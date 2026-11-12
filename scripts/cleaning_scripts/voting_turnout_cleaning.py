@@ -2,6 +2,8 @@
 
 from pathlib import Path
 import pandas as pd
+from io import TextIOWrapper
+from zipfile import ZIP_DEFLATED, ZipFile
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -24,7 +26,7 @@ BFS_FILE = (
 )
 
 OUTPUT_DIR = PROJECT_ROOT / "data" / "clean_data"
-OUTPUT_FILE = OUTPUT_DIR / "voting_turnout_clean.csv"
+OUTPUT_FILE = OUTPUT_DIR / "voting_turnout_clean.csv.zip"
 
 SPECIAL_TERMS = (
     "Ausland-CH",
@@ -136,9 +138,23 @@ def main():
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    with pd.read_csv(
-        TURNOUT_FILE, sep=";", encoding="cp1252", chunksize=100_000
-    ) as reader:
+    temporary_output = OUTPUT_FILE.with_suffix(".zip.tmp")
+
+    with (
+        pd.read_csv(
+            TURNOUT_FILE,
+            sep=";",
+            encoding="cp1252",
+            chunksize=100_000,
+        ) as reader,
+        ZipFile(
+            temporary_output,
+            mode="w",
+            compression=ZIP_DEFLATED,
+        ) as archive,
+        archive.open(OUTPUT_FILE.stem, mode="w") as member,
+        TextIOWrapper(member, encoding="utf-8", newline="") as output,
+    ):
         for chunk_number, chunk in enumerate(reader):
             chunk = add_geography_columns(chunk, municipality_lookup)
             chunk, current_canton = add_canton_column(chunk, current_canton)
@@ -152,11 +168,12 @@ def main():
 
             first_chunk = chunk_number == 0
             chunk.to_csv(
-                OUTPUT_FILE,
-                mode="w" if first_chunk else "a",
+                output,
                 header=first_chunk,
                 index=False,
             )
+
+    temporary_output.replace(OUTPUT_FILE)
 
     print(f"Cleaned data written to {OUTPUT_FILE}")
     print(f"Distinct municipality names without a BFS code: {len(unmatched_names)}")

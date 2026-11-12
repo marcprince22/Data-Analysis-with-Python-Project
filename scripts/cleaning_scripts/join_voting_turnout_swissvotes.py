@@ -1,14 +1,16 @@
 from pathlib import Path
-
 import pandas as pd
+from io import TextIOWrapper
+from zipfile import ZIP_DEFLATED, ZipFile
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 CLEAN_DATA_DIR = PROJECT_ROOT / "data" / "clean_data"
 
-TURNOUT_FILE = CLEAN_DATA_DIR / "voting_turnout_clean.csv"
+
+TURNOUT_FILE = CLEAN_DATA_DIR / "voting_turnout_clean.csv.zip"
 CROSSWALK_FILE = CLEAN_DATA_DIR / "voting_turnout_swissvotes_crosswalk.csv"
-OUTPUT_FILE = CLEAN_DATA_DIR / "voting_turnout_swissvotes_joined.csv"
+OUTPUT_FILE = CLEAN_DATA_DIR / "voting_turnout_swissvotes_joined.csv.zip"
 
 JOIN_COLUMNS = ["Datum", "Vorlage"]
 
@@ -42,16 +44,15 @@ def main():
         dtype=str,
     )
 
-    temporary_output = OUTPUT_FILE.with_suffix(".csv.tmp")
+    temporary_output = OUTPUT_FILE.with_suffix(".zip.tmp")
+    csv_name = OUTPUT_FILE.stem  # Entfernt .zip und behält .csv.
     rows_written = 0
 
     with (
-        pd.read_csv(
-            TURNOUT_FILE,
-            dtype={"GDENR": str},
-            chunksize=100_000,
-        ) as reader,
-        temporary_output.open("w", encoding="utf-8", newline="") as output,
+        pd.read_csv(TURNOUT_FILE, dtype={"GDENR": str}, chunksize=100_000) as reader,
+        ZipFile(temporary_output, mode="w", compression=ZIP_DEFLATED) as archive,
+        archive.open(csv_name, mode="w") as member,
+        TextIOWrapper(member, encoding="utf-8", newline="") as output,
     ):
         for chunk_number, chunk in enumerate(reader):
             joined = join_swissvotes(chunk, crosswalk)

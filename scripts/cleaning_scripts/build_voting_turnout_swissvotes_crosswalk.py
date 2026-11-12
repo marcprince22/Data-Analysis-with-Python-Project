@@ -8,7 +8,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 SWISSVOTES_FILE = (
     PROJECT_ROOT / "data" / "raw_data" / "voting_turnout" / "swissvotes.csv"
 )
-TURNOUT_FILE = PROJECT_ROOT / "data" / "clean_data" / "voting_turnout_clean.csv"
+TURNOUT_FILE = PROJECT_ROOT / "data" / "clean_data" / "voting_turnout_clean.csv.zip"
 CROSSWALK_FILE = (
     PROJECT_ROOT / "data" / "clean_data" / "voting_turnout_swissvotes_crosswalk.csv"
 )
