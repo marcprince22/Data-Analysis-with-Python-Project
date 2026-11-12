@@ -24,7 +24,16 @@ BFS_FILE = (
 OUTPUT_DIR = PROJECT_ROOT / "data" / "clean_data"
 OUTPUT_FILE = OUTPUT_DIR / "voting_turnout_clean.csv"
 
-SPECIAL_TERMS = ("Ausland-CH", "Anderes", "Korrespondenzweg")
+SPECIAL_TERMS = (
+    "Ausland-CH",
+    "Anderes",
+    "Korrespondenzweg",
+    "CH de l'étranger",
+    "-autres",
+    "CH-all'estero",
+    "-altri",
+    "-voto per corrispondenza",
+)
 
 
 # load municipalities file to join with turnoutfile. Bc in turnoutfile there are no municipality codes
@@ -83,7 +92,7 @@ def add_geography_columns(chunk, municipality_lookup):
     )
 
     chunk["GDENR"] = [
-        municipality_lookup.get(name, "")
+        municipality_lookup.get(name.partitition(" (Gemeinsame Urne,")[0].strip(), "")
         if geography_type == "Gemeinde" and not is_special
         else ""
         for geography_type, name, is_special in parsed
