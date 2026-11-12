@@ -27,6 +27,7 @@ OUTPUT_FILE = OUTPUT_DIR / "voting_turnout_clean.csv"
 SPECIAL_TERMS = ("Ausland-CH", "Anderes", "Korrespondenzweg")
 
 
+# load municipalities file to join with turnoutfile. Bc in turnoutfile there are no municipality codes
 def load_municipality_lookup():
     bfs = pd.read_csv(
         BFS_FILE,
@@ -49,6 +50,7 @@ def load_municipality_lookup():
     return dict(zip(municipalities["Name"], municipalities["BfsCode"]))
 
 
+# Tidy up names of geographical instances
 def parse_geography(raw_value):
     value = raw_value.strip()
 
@@ -67,6 +69,7 @@ def parse_geography(raw_value):
     return geography_type, name, is_special
 
 
+# Bc voting turnout file is too big use chunks. Add column with municipalitiy code
 def add_geography_columns(chunk, municipality_lookup):
     parsed = [
         parse_geography(value)
@@ -89,6 +92,7 @@ def add_geography_columns(chunk, municipality_lookup):
     return chunk
 
 
+# For each geographical instance we add its canton. For Switherland there is "" added
 def add_canton_column(chunk, current_canton):
     canton_names = []
 
@@ -106,3 +110,46 @@ def add_canton_column(chunk, current_canton):
 
     chunk["Kanton"] = canton_names
     return chunk, current_canton
+
+
+def main():
+    preview = pd.read_csv(TURNOUT_FILE, encoding="cp1252", sep=";", nrows=5)
+    print(preview.columns.tolist())
+    print(preview.to_string(index=False))
+
+
+"""
+    municipality_lookup = load_municipality_lookup()
+    current_canton = None
+    unmatched_names = set()
+
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    with pd.read_csv(TURNOUT_FILE, chunksize=100_000) as reader:
+        for chunk_number, chunk in enumerate(reader):
+            chunk = add_geography_columns(chunk, municipality_lookup)
+            chunk, current_canton = add_canton_column(chunk, current_canton)
+
+            unmatched = (
+                chunk["Geografietyp"].eq("Gemeinde")
+                & ~chunk["Sonderfall"]
+                & chunk["GDENR"].eq("")
+            )
+            unmatched_names.update(chunk.loc[unmatched, "Name"])
+
+            first_chunk = chunk_number == 0
+            chunk.to_csv(
+                OUTPUT_FILE,
+                mode="w" if first_chunk else "a",
+                header=first_chunk,
+                index=False,
+            )
+
+    print(f"Cleaned data written to {OUTPUT_FILE}")
+    print(f"Distinct municipality names without a BFS code: {len(unmatched_names)}")
+    for name in sorted(unmatched_names):
+        print(f"  {name}")
+"""
+
+if __name__ == "__main__":
+    main()
