@@ -92,7 +92,7 @@ def add_geography_columns(chunk, municipality_lookup):
     )
 
     chunk["GDENR"] = [
-        municipality_lookup.get(name.partitition(" (Gemeinsame Urne,")[0].strip(), "")
+        municipality_lookup.get(name.partition(" (Gemeinsame Urne,")[0].strip(), "")
         if geography_type == "Gemeinde" and not is_special
         else ""
         for geography_type, name, is_special in parsed
