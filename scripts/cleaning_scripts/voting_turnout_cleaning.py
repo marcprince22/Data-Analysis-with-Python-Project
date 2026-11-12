@@ -1,5 +1,9 @@
+# This file is used to clean voting turnout and add bfs municipality number
+
 from pathlib import Path
 import pandas as pd
+from io import TextIOWrapper
+from zipfile import ZIP_DEFLATED, ZipFile
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -22,11 +26,21 @@ BFS_FILE = (
 )
 
 OUTPUT_DIR = PROJECT_ROOT / "data" / "clean_data"
-OUTPUT_FILE = OUTPUT_DIR / "voting_turnout_clean.csv"
+OUTPUT_FILE = OUTPUT_DIR / "voting_turnout_clean.csv.zip"
 
-SPECIAL_TERMS = ("Ausland-CH", "Anderes", "Korrespondenzweg")
+SPECIAL_TERMS = (
+    "Ausland-CH",
+    "Anderes",
+    "Korrespondenzweg",
+    "CH de l'étranger",
+    "-autres",
+    "CH-all'estero",
+    "-altri",
+    "-voto per corrispondenza",
+)
 
 
+# load municipalities file to join with turnoutfile. Bc in turnoutfile there are no municipality codes
 def load_municipality_lookup():
     bfs = pd.read_csv(
         BFS_FILE,
@@ -49,6 +63,7 @@ def load_municipality_lookup():
     return dict(zip(municipalities["Name"], municipalities["BfsCode"]))
 
 
+# Tidy up names of geographical instances
 def parse_geography(raw_value):
     value = raw_value.strip()
 
@@ -67,6 +82,7 @@ def parse_geography(raw_value):
     return geography_type, name, is_special
 
 
+# Bc voting turnout file is too big use chunks. Add column with municipalitiy code
 def add_geography_columns(chunk, municipality_lookup):
     parsed = [
         parse_geography(value)
@@ -80,7 +96,7 @@ def add_geography_columns(chunk, municipality_lookup):
     )
 
     chunk["GDENR"] = [
-        municipality_lookup.get(name, "")
+        municipality_lookup.get(name.partition(" (Gemeinsame Urne,")[0].strip(), "")
         if geography_type == "Gemeinde" and not is_special
         else ""
         for geography_type, name, is_special in parsed
@@ -89,6 +105,7 @@ def add_geography_columns(chunk, municipality_lookup):
     return chunk
 
 
+# For each geographical instance we add its canton. For Switherland there is "" added
 def add_canton_column(chunk, current_canton):
     canton_names = []
 
@@ -106,3 +123,63 @@ def add_canton_column(chunk, current_canton):
 
     chunk["Kanton"] = canton_names
     return chunk, current_canton
+
+
+def main():
+    """
+    preview = pd.read_csv(TURNOUT_FILE, encoding="cp1252", sep=";", nrows=5)
+    print(preview.columns.tolist())
+    print(preview.to_string(index=False))
+    """
+
+    municipality_lookup = load_municipality_lookup()
+    current_canton = None
+    unmatched_names = set()
+
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    temporary_output = OUTPUT_FILE.with_suffix(".zip.tmp")
+
+    with (
+        pd.read_csv(
+            TURNOUT_FILE,
+            sep=";",
+            encoding="cp1252",
+            chunksize=100_000,
+        ) as reader,
+        ZipFile(
+            temporary_output,
+            mode="w",
+            compression=ZIP_DEFLATED,
+        ) as archive,
+        archive.open(OUTPUT_FILE.stem, mode="w") as member,
+        TextIOWrapper(member, encoding="utf-8", newline="") as output,
+    ):
+        for chunk_number, chunk in enumerate(reader):
+            chunk = add_geography_columns(chunk, municipality_lookup)
+            chunk, current_canton = add_canton_column(chunk, current_canton)
+
+            unmatched = (
+                chunk["Geografietyp"].eq("Gemeinde")
+                & ~chunk["Sonderfall"]
+                & chunk["GDENR"].eq("")
+            )
+            unmatched_names.update(chunk.loc[unmatched, "Name"])
+
+            first_chunk = chunk_number == 0
+            chunk.to_csv(
+                output,
+                header=first_chunk,
+                index=False,
+            )
+
+    temporary_output.replace(OUTPUT_FILE)
+
+    print(f"Cleaned data written to {OUTPUT_FILE}")
+    print(f"Distinct municipality names without a BFS code: {len(unmatched_names)}")
+    for name in sorted(unmatched_names):
+        print(f"  {name}")
+
+
+if __name__ == "__main__":
+    main()
