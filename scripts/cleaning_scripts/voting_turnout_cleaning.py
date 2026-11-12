@@ -1,3 +1,5 @@
+# This file is used to clean voting turnout and add bfs municipality number
+
 from pathlib import Path
 import pandas as pd
 
