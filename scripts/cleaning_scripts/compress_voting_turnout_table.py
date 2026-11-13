@@ -18,6 +18,14 @@ OUTPUT_COLUMNS = {
     "Titel_offiziell_Swissvotes": "Titel",
 }
 
+LEGAL_FORM_LABELS = {
+    "1": "Obligatorisches Referendum",
+    "2": "Fakultatives Referendum",
+    "3": "Volksinitiative",
+    "4": "Direkter Gegenentwurf zu einer Volksinitiative",
+    "5": "Stichfrage",
+}
+
 
 # Filter municipal rows and export
 def main():
@@ -48,6 +56,16 @@ def main():
 
             municipal = chunk.loc[is_municipality, list(OUTPUT_COLUMNS)]
             municipal = municipal.rename(columns=OUTPUT_COLUMNS)
+            codes = municipal["Rechtsform"].str.strip()
+            labels = codes.map(LEGAL_FORM_LABELS)
+
+            if labels.isna().any():
+                unknown = codes[labels.isna()].drop_duplicates().tolist()
+                raise ValueError(
+                    f"Unknown or missing Swissvotes legal forms: {unknown}"
+                )
+
+            municipal["Rechtsform"] = labels
             municipal.to_csv(
                 output,
                 sep=";",
