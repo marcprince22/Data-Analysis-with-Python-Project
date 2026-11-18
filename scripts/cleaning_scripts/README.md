@@ -69,3 +69,59 @@
     analysis, select rows with `Geografietyp == "Gemeinde"`,
     `Sonderfall == False`, and a populated `GDENR`. Check the values in
     `Beteiligung in %` before converting the column to a numeric type.
+
+# Zurich socioeconomic time series
+
+Cleans six Gemeindeporträt indicators of the Statistisches Amt Kanton Zürich
+and the BFS education data, and merges them into one panel for the
+160 Zurich municipalities of 1 January 2026.
+
+    python scripts/cleaning_scripts/socioeconomic_factors_panel_cleaning.py
+
+Inputs → `data/raw_data/socioeconomic_factors/time_series_socio_factors/`
+and `BFS_Gemeindeverzeichnis_2026-01-01.csv`.
+
+Steps: drop districts, regions and canton (`BFS_NR` 0); keep only
+municipalities that exist in 2026 (drops merged "(bis ...)" municipalities);
+keep municipality, year and value; merge all factors on `GDENR` and `year`.
+
+Output → `data/clean_data/ts_zh_socioeconomic_panel_clean.csv`
+
+| Column | Unit | Years |
+| --- | --- | --- |
+| `GDENR` | BFS municipality number | |
+| `foreigner_rate` | % of population | 1978–2025 |
+| `social_assistance_rate` | % of population | 2007–2024 |
+| `unemployment_rate` | % of population aged 15–64 | 2011–2024 |
+| `tertiary_share` | % of population aged 25–64 | 1990, 2000, 2017–2023 |
+| `median_income` | CHF, taxable income | 1999–2022 |
+| `old_age_ratio` | 65+ per 100 aged 20–64 | 1998–2025 |
+| `population_density` | inhabitants per km² | 1962–2025 |
+
+Known gaps: social assistance and unemployment are suppressed for some
+small municipalities (privacy). For merged municipalities (codes 291–298),
+some indicators only start in the merger year.
+
+# Zurich turnout per municipality and year
+
+This workflow takes the cleaned BFS turnout data (`data/clean_data/voting_turnout_clean.csv.zip`) and computes the average turnout per Zurich municipality and year.
+
+```bash
+python scripts/cleaning_scripts/ts_zh_turnout_cleaning.py
+```
+
+**Steps:**
+1. Keep only rows with Geografietyp "Gemeinde", Kanton "Zürich" and Sonderfall False (no Swiss abroad).
+2. Take the year from the first 4 characters of "Datum und Vorlage".
+3. Average the turnout of all votes per municipality and year.
+4. Checks: no duplicate GDENR × year rows, exactly 160 municipalities.
+
+**Output:** `data/clean_data/ts_zh_turnout_clean.csv`
+
+| Column  | Description                                   |
+|---------|-----------------------------------------------|
+| GDENR   | BFS municipality number (2026 municipalities) |
+| year    | Year of the votes (1960–2026)                 |
+| turnout | Mean turnout of all federal votes in that year, in % |
+
+Municipalities that merged later (291–298) are already on the 2026 boundaries back to 1960.
