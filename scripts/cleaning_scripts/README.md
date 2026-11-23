@@ -125,3 +125,59 @@ python scripts/cleaning_scripts/ts_zh_turnout_cleaning.py
 | turnout | Mean turnout of all federal votes in that year, in % |
 
 Municipalities that merged later (291–298) are already on the 2026 boundaries back to 1960.
+
+    # Zurich regression panel
+
+    This workflow merges the Zurich turnout data with the Zurich socioeconomic panel into one table for the regression (one row per municipality and year).
+
+    ```bash
+    python scripts/analysis/zh_merge_panel.py
+    ```
+
+    **Inputs:** `data/clean_data/ts_zh_turnout_clean.csv` and `data/clean_data/ts_zh_socioeconomic_panel_clean.csv` (run their scripts first).
+
+    **Steps:**
+    1. Merge both tables on GDENR and year, keeping only municipality-years that exist in both (inner merge).
+    2. Checks: no duplicate GDENR × year rows, exactly 160 municipalities.
+    3. Sort by GDENR and year.
+
+    **Output:** `data/clean_data/zh_regression_panel.csv` (10,207 rows, 160 municipalities, 1962–2025)
+
+    | Column | Description |
+    |--------|-------------|
+    | GDENR, year | Municipality number and year |
+    | turnout | Mean turnout of all federal votes in that year, in % |
+    | foreigner_rate … population_density | Socioeconomic factors, see "Zurich socioeconomic panel" above |
+
+    Missing values are kept. The regression period (2011–2022 or 1999–2022), dropping incomplete rows and log transformations are done in the analysis, not here.
+
+# Fixed effects regression: turnout and socioeconomic factors (Zurich)
+
+This workflow estimates how the socioeconomic factors of the Zurich municipalities relate to turnout, and saves the results for the Streamlit app.
+
+```bash
+python scripts/analysis/zh_fixed_effects_regression.py
+```
+
+**Input:** `data/clean_data/zh_regression_panel.csv` (run `scripts/cleaning_scripts/zh_merge_panel.py` first).
+
+**Steps:**
+1. Select the period, drop rows with missing values and take logs of median income and population density.
+2. Estimate six models with standard errors clustered by municipality:
+
+| Model | Period | Description |
+|-------|--------|-------------|
+| Model 1 (OLS) | 2011–2022 | Pooled OLS, no fixed effects |
+| Model 2 (+ municipality FE) | 2011–2022 | Municipality fixed effects |
+| Model 3 (+ year FE) | 2011–2022 | Municipality and year fixed effects (**main model**) |
+| Model 4 (1999–2022) | 1999–2022 | As model 3, without unemployment and social assistance rate |
+| Model 5 (+ education) | 2017–2022 | As model 3, plus tertiary share |
+| Model 6 (without merged) | 2011–2022 | As model 3, without the merged municipalities (GDENR 291–298) |
+
+3. Checks: the main sample has 1,677 rows, the results table has 6 models.
+
+**Output:**
+- `data/results/zh_regression_coefficients.csv`: coefficients per factor (rows) and model (columns). The last row `observations` gives the number of rows per model.
+- `data/results/zh_regression_pvalues.csv`: p-values in the same layout.
+
+Factors that are not part of a model are left empty.
