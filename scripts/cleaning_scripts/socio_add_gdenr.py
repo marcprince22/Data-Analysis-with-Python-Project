@@ -3,7 +3,7 @@ import pandas as pd
 
 # %%
 # loading the Data
-PATH = "C:/Users/marcp/Data-Analysis-with-Python-Project/"
+PATH = "../../"
 socio = pd.read_csv(PATH + "data/clean_data/socioeconomics_factors.csv")
 corr = pd.read_csv(
     PATH + "data/raw_data/geographic_reference/bfs_municipalities/BFS_Gemeindekorrespondenz_2021-2026.csv")
@@ -118,7 +118,7 @@ socio_new["Share primary sector"] = socio_new["Economy - Employed, primary secto
 socio_new.loc[4095]
 # %%
 # change name of index
-socio_new.index.name = "BFS_NR"
+socio_new.index.name = "GDENR"
 
 # save as csv
 socio_new.to_csv(PATH + "data/clean_data/socio_comnr_2026.csv", index=True)
