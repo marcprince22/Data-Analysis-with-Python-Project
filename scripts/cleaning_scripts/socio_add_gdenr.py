@@ -3,7 +3,7 @@ import pandas as pd
 
 # %%
 # loading the Data
-PATH = ""../../""
+PATH = "../../"
 socio = pd.read_csv(PATH + "data/clean_data/socioeconomics_factors.csv")
 corr = pd.read_csv(
     PATH + "data/raw_data/geographic_reference/bfs_municipalities/BFS_Gemeindekorrespondenz_2021-2026.csv")
