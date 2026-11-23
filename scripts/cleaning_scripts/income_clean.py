@@ -49,7 +49,8 @@ for col in values:
 income_new.head()
 
 # %%
-income_new.index.name = "MUNNR"
+income_new.index.name = "GDENR"
 income_new.to_csv(PATH + "data/clean_data/income_gdenr_2026.csv")
 print(income_new.shape)  # 2110 is correct
+income_new.head()
 # %%
