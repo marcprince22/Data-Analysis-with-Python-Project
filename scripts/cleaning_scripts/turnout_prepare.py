@@ -3,7 +3,7 @@
 import pandas as pd
 PATH = "../../"
 
-columns = ["GDENR", "Beteiligung in %", "Jahr", "Datum", "Rechtsform_Code",
+columns = ["GDENR", "Beteiligung in %", "Jahr", "Datum","Kanton", "Rechtsform_Code",
            "Geografietyp", "Sonderfall", "Stimmberechtigte"]
 
 turnout = pd.read_csv(
@@ -43,5 +43,16 @@ turnout_mean.index = turnout_mean.index.astype(int)
 print(turnout_mean.head())
 
 # %%
-turnout_mean.to_csv(PATH + "data/clean_data/turnout_gdenr_2026.csv")
+# add canton (one canton per municipality)
+cantons = turnout[["GDENR", "Kanton"]].drop_duplicates()
+cantons["GDENR"] = cantons["GDENR"].astype(int)
+cantons = cantons.set_index("GDENR")
+cantons = cantons.rename(columns={"Kanton": "canton"})
+
+turnout_mean = turnout_mean.join(cantons)
+
+print(turnout_mean["canton"].isna().sum())   # should be 0
+turnout_mean.head()
 # %%
+# %%
+turnout_mean.to_csv(PATH + "data/clean_data/turnout_gdenr_2026.csv")
