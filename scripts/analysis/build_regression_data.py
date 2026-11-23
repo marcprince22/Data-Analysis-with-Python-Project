@@ -35,6 +35,7 @@ data = data.rename(columns={
     "TERTIARY": "share_tertiary",
     "Median_2015": "income_median",
     "Gini_2015": "income_gini",
+    "Kanton": "canton"
 })
 
 # %%
@@ -43,7 +44,7 @@ keep = ["GDENR", "turnout_mean", "n_votes",
         "population", "population_density",
         "share_age_0_19", "share_age_65plus", "share_foreign",
         "share_primary_sector", "share_tertiary",
-        "income_median", "income_gini", "social_assistance_rate"]
+        "income_median", "income_gini", "social_assistance_rate", "canton"]
 data = data[keep]
 
 print(data.shape)  # (2110, 13
@@ -52,3 +53,4 @@ data.head()
 print(data.isna().sum())
 # %%
 data.to_csv(PATH + "data/clean_data/regression_data.csv", index=False)
+
