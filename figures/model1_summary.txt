@@ -1,0 +1,36 @@
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:           turnout_mean   R-squared:                       0.614
+Model:                            OLS   Adj. R-squared:                  0.612
+Method:                 Least Squares   F-statistic:                     310.6
+Date:                Thu, 26 Nov 2026   Prob (F-statistic):               0.00
+Time:                        09:12:00   Log-Likelihood:                -5278.2
+No. Observations:                1966   AIC:                         1.058e+04
+Df Residuals:                    1955   BIC:                         1.064e+04
+Df Model:                          10                                         
+Covariance Type:            nonrobust                                         
+==========================================================================================
+                             coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------------------
+Intercept                 34.8268      1.732     20.109      0.000      31.430      38.223
+share_tertiary             0.3115      0.015     21.381      0.000       0.283       0.340
+income_median_1000         0.0640      0.014      4.522      0.000       0.036       0.092
+income_gini_100            0.1091      0.019      5.745      0.000       0.072       0.146
+log_population            -0.4831      0.107     -4.533      0.000      -0.692      -0.274
+log_population_density    -0.6806      0.102     -6.660      0.000      -0.881      -0.480
+share_age_0_19             0.0623      0.040      1.571      0.116      -0.015       0.140
+share_age_65plus           0.1030      0.031      3.334      0.001       0.042       0.164
+share_foreign             -0.0554      0.012     -4.511      0.000      -0.079      -0.031
+share_primary_sector       0.0079      0.008      0.990      0.322      -0.008       0.024
+compulsory_voting         19.9761      0.710     28.119      0.000      18.583      21.369
+==============================================================================
+Omnibus:                       16.781   Durbin-Watson:                   1.247
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               21.448
+Skew:                           0.122   Prob(JB):                     2.20e-05
+Kurtosis:                       3.450   Cond. No.                     1.88e+03
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+[2] The condition number is large, 1.88e+03. This might indicate that there are
+strong multicollinearity or other numerical problems.
