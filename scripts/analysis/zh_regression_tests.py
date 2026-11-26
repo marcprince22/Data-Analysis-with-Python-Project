@@ -6,12 +6,14 @@ import pandas as pd
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 from statsmodels.nonparametric.smoothers_lowess import lowess
+from statsmodels.stats.diagnostic import het_breuschpagan
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 INPUT_FILE = PROJECT_ROOT / "data" / "clean_data" / "zh_regression_panel.csv"
 VIF_FILE = PROJECT_ROOT / "figures" / "zh_vif.csv"
 PLOT_FILE = PROJECT_ROOT / "figures" / "zh_regression_assumption_check.png"
+TESTS_FILE = PROJECT_ROOT / "figures" / "zh_residual_tests.csv"
 
 
 def main():
@@ -37,13 +39,31 @@ def main():
         "log_population_density",
     ]
 
-    X = sm.add_constant(df[factors])
+    within = df[factors] - df.groupby("GDENR")[factors].transform("mean")
+    within = within - within.groupby(df["year"]).transform("mean")
 
-    vif_values = []
+    X_pooled = sm.add_constant(df[factors])
+    X_within = sm.add_constant(within)
+
+    vif_pooled = []
+    vif_within = []
     for i in range(1, len(factors) + 1):
-        vif_values.append(variance_inflation_factor(X.values, i))
+        vif_pooled.append(variance_inflation_factor(X_pooled.values, i))
+        vif_within.append(variance_inflation_factor(X_within.values, i))
 
-    vif = pd.DataFrame({"variable": factors, "VIF": vif_values})
+    vif = pd.DataFrame({"variable": factors, "VIF pooled": vif_pooled, "VIF within": vif_within})
+
+    df["resid"] = model3.resid
+    df = df.sort_values(["GDENR", "year"])
+    df["resid_lag"] = df.groupby("GDENR")["resid"].shift(1)
+    autocorrelation = df["resid"].corr(df["resid_lag"])
+
+    bp_stat, bp_pvalue, f_stat, f_pvalue = het_breuschpagan(model3.resid, X_pooled.loc[model3.resid.index])
+
+    tests = pd.DataFrame({
+        "test": ["Autocorrelation of residuals (lag 1)", "Breusch-Pagan p-value"],
+        "value": [autocorrelation, bp_pvalue],
+    })
 
     influence = model3.get_influence()
 
@@ -61,7 +81,7 @@ def main():
 
     if len(df) != 1677:
         raise ValueError("The main sample does not contain 1677 rows")
-    if vif["VIF"].max() > 5:
+    if vif[["VIF pooled", "VIF within"]].max().max() > 5:
         raise ValueError("At least one VIF is above 5")
 
     fig, axes = plt.subplots(2, 2, figsize=(16, 10))
@@ -90,21 +110,21 @@ def main():
     ax.set_title("Scale-Location")
 
     ax = axes[1, 1]
-    ax.scatter(diag["leverage"], diag["std_resid"], s=8, alpha=0.4)
-    smooth = lowess(diag["std_resid"], diag["leverage"])
-    ax.plot(smooth[:, 0], smooth[:, 1], color="red")
-    ax.axhline(0, color="grey", linestyle="--")
-    ax.set_xlabel("Leverage")
-    ax.set_ylabel("Standardized residuals")
-    ax.set_title("Residuals vs Leverage")
+    ax.scatter(range(len(diag)), diag["cooks"], s=8, alpha=0.4)
+    ax.axhline(1, color="red", linestyle="--")
+    ax.set_xlabel("Observation")
+    ax.set_ylabel("Cook's distance")
+    ax.set_title("Cook's distance")
 
     vif.round(2).to_csv(VIF_FILE, index=False)
+    tests.round(3).to_csv(TESTS_FILE, index=False)
     fig.savefig(PLOT_FILE, dpi=150, bbox_inches="tight")
 
     print(vif.round(2))
     print("Largest Cook's distance:", round(diag["cooks"].max(), 3))
     print("Rows with Cook's distance above 1:", (diag["cooks"] > 1).sum())
-    print("Saved", VIF_FILE.name, "and", PLOT_FILE.name)
+    print(tests.round(3))
+    print("Saved", VIF_FILE.name, TESTS_FILE.name, "and", PLOT_FILE.name)
 
 
 if __name__ == "__main__":

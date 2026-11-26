@@ -1,7 +1,7 @@
-variable,VIF
-foreigner_rate,3.5
-social_assistance_rate,2.86
-unemployment_rate,2.26
-log_median_income,2.22
-old_age_ratio,1.43
-log_population_density,2.86
+variable,VIF pooled,VIF within
+foreigner_rate,3.5,1.33
+social_assistance_rate,2.86,1.02
+unemployment_rate,2.26,1.02
+log_median_income,2.22,1.05
+old_age_ratio,1.43,1.26
+log_population_density,2.86,1.43
