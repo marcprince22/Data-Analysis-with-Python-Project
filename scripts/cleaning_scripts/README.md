@@ -194,11 +194,13 @@ python scripts/analysis/zh_regression_tests.py
 
 **Steps:**
 1. Build the same sample as the main regression (2011–2022, no missing values, logs of median income and population density) and estimate Model 3.
-2. VIF (variance inflation factor) of the six factors, to check for multicollinearity (problematic above 5).
-3. Residual diagnostics of Model 3: residuals vs fitted values (linearity), normal Q-Q plot (normality), scale-location (equal variance) and residuals vs leverage (influential observations). The 5 municipalities with only one complete year are left out of the plots (leverage = 1). They do not affect the fixed effects estimates.
+2. VIF (variance inflation factor) of the six factors, to check for multicollinearity (problematic above 5): pooled (raw values) and within (after removing municipality and year means, the variation used by Model 3).
+3. Residual diagnostics of Model 3: residuals vs fitted values (linearity), normal Q-Q plot (normality), scale-location (equal variance) and Cook's distance (influential observations). The 5 municipalities with only one complete year are left out of the plots (leverage = 1). They do not affect the fixed effects estimates. A residuals vs leverage plot is not used, because in a fixed effects model the leverage mainly reflects how many years a municipality is observed.
 4. Cook's distance (printed): no row should be above 1.
-5. Checks: the sample has 1,677 rows and no VIF is above 5.
+5. Autocorrelation: correlation of each municipality's residual with its residual of the previous year. Heteroskedasticity: Breusch-Pagan test (p-value below 0.05 means unequal variance). Both are handled by the clustered standard errors.
+6. Checks: the sample has 1,677 rows and no VIF is above 5.
 
 **Output:**
-- `figures/zh_vif.csv`: VIF per factor.
+- `figures/zh_vif.csv`: pooled and within VIF per factor.
+- `figures/zh_residual_tests.csv`: autocorrelation and Breusch-Pagan results.
 - `figures/zh_regression_assumption_check.png`: the four diagnostic plots.
