@@ -159,7 +159,7 @@ This workflow estimates how the socioeconomic factors of the Zurich municipaliti
 python scripts/analysis/zh_fixed_effects_regression.py
 ```
 
-**Input:** `data/clean_data/zh_regression_panel.csv` (run `scripts/cleaning_scripts/zh_merge_panel.py` first).
+**Input:** `data/clean_data/zh_regression_panel.csv` (run `scripts/analysis/zh_merge_panel.py` first).
 
 **Steps:**
 1. Select the period, drop rows with missing values and take logs of median income and population density.
@@ -181,3 +181,24 @@ python scripts/analysis/zh_fixed_effects_regression.py
 - `data/results/zh_regression_pvalues.csv`: p-values in the same layout.
 
 Factors that are not part of a model are left empty.
+
+# Regression tests: assumptions of the main model (Zurich)
+
+This workflow checks the assumptions of the main fixed effects regression (Model 3: municipality and year fixed effects, 2011–2022) and saves the results as figures.
+
+```bash
+python scripts/analysis/zh_regression_tests.py
+```
+
+**Input:** `data/clean_data/zh_regression_panel.csv` (run `scripts/analysis/zh_merge_panel.py` first).
+
+**Steps:**
+1. Build the same sample as the main regression (2011–2022, no missing values, logs of median income and population density) and estimate Model 3.
+2. VIF (variance inflation factor) of the six factors, to check for multicollinearity (problematic above 5).
+3. Residual diagnostics of Model 3: residuals vs fitted values (linearity), normal Q-Q plot (normality), scale-location (equal variance) and residuals vs leverage (influential observations). The 5 municipalities with only one complete year are left out of the plots (leverage = 1). They do not affect the fixed effects estimates.
+4. Cook's distance (printed): no row should be above 1.
+5. Checks: the sample has 1,677 rows and no VIF is above 5.
+
+**Output:**
+- `figures/zh_vif.csv`: VIF per factor.
+- `figures/zh_regression_assumption_check.png`: the four diagnostic plots.
