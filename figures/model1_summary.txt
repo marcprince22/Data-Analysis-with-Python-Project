@@ -4,7 +4,7 @@ Dep. Variable:           turnout_mean   R-squared:                       0.614
 Model:                            OLS   Adj. R-squared:                  0.612
 Method:                 Least Squares   F-statistic:                     310.6
 Date:                Thu, 26 Nov 2026   Prob (F-statistic):               0.00
-Time:                        09:12:00   Log-Likelihood:                -5278.2
+Time:                        09:55:26   Log-Likelihood:                -5278.2
 No. Observations:                1966   AIC:                         1.058e+04
 Df Residuals:                    1955   BIC:                         1.064e+04
 Df Model:                          10                                         

@@ -1,9 +1,11 @@
 # %%
-import pandas as pd
-import numpy as np
-import statsmodels.api as sm
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
 from statsmodels.nonparametric.smoothers_lowess import lowess
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
 PATH = "../../"
 
 data = pd.read_csv(PATH + "data/clean_data/regression_data.csv")
@@ -12,11 +14,11 @@ data = pd.read_csv(PATH + "data/clean_data/regression_data.csv")
 # Prepare variables for regression
 data["log_population"] = np.log(data["population"])
 data["log_population_density"] = np.log(data["population_density"])
-data["income_median_1000"] = data["income_median"] / 1000 #income in 1000 CHF
-data["income_gini_100"] = data["income_gini"] * 100 #gini index in percentage
+data["income_median_1000"] = data["income_median"] / 1000  # income in 1000 CHF
+data["income_gini_100"] = data["income_gini"] * 100  # gini index in percentage
 data["compulsory_voting"] = (data["canton"] == "Schaffhausen").astype(int)
 
-# %% 
+# %%
 # create main regression model
 formula = ("turnout_mean ~ share_tertiary + income_median_1000 + income_gini_100"
            " + log_population + log_population_density"
@@ -27,8 +29,8 @@ formula = ("turnout_mean ~ share_tertiary + income_median_1000 + income_gini_100
 model1 = sm.OLS.from_formula(formula, data=data).fit()
 with open(PATH + "figures/model1_summary.txt", "w") as f:
     f.write(model1.summary().as_text())
-    
-    
+
+
 print(model1.summary())
 
 # %%
@@ -40,7 +42,8 @@ fitted = model1.fittedvalues                      # predicted values
 resid = model1.resid                              # residuals
 influence = model1.get_influence()
 std_resid = influence.resid_studentized_internal  # standardized residuals
-leverage = influence.hat_matrix_diag              # leverage of each municipality
+# leverage of each municipality
+leverage = influence.hat_matrix_diag
 cooks = influence.cooks_distance[0]               # Cook's distance
 
 # Residuls vs Fitted -> linearity
@@ -53,7 +56,7 @@ ax.set_xlabel("Fitted values")
 ax.set_ylabel("Residuals")
 ax.set_title("Residuals vs Fitted")
 
-#Normal Q-Q plot -> normality of residuals
+# Normal Q-Q plot -> normality of residuals
 ax = axes[0, 1]
 sm.qqplot(std_resid, line="45", ax=ax)
 ax.set_ylabel("Standardized residuals")
@@ -69,7 +72,7 @@ ax.set_xlabel("Fitted values")
 ax.set_ylabel("√|Standardized residuals|")
 ax.set_title("Scale-Location")
 
-#cooks distance plot -> influential observations
+# cooks distance plot -> influential observations
 ax = axes[1, 1]
 ax.scatter(leverage, std_resid, s=8, alpha=0.4)
 smooth = lowess(std_resid, leverage)
@@ -85,7 +88,6 @@ fig.savefig(PATH + "figures/regression_assumption_check.png",
 
 # %%
 # checking for multicollinearity using VIF (problematic if values are above 5)
-from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 X = model1.model.exog            # explanatory variables of the model
 names = model1.model.exog_names
@@ -93,10 +95,40 @@ names = model1.model.exog_names
 vif_values = []
 for i, name in enumerate(names):
     if name != "Intercept":
-        vif_values.append({"variable": name, "VIF": round(variance_inflation_factor(X, i), 2)})
+        vif_values.append({"variable": name, "VIF": round(
+            variance_inflation_factor(X, i), 2)})
 
 vif_table = pd.DataFrame(vif_values).sort_values("VIF", ascending=False)
 vif_table.to_csv(PATH + "figures/model1_vif.csv", index=False)
-vif_table   
+vif_table
 
-# %%
+# %% Checking if social Assistance has an influence
+
+# only municipalities with social assistance rate
+
+data_sa = data[data["social_assistance_rate"].notna()]
+print(len(data_sa))
+
+# Model 1b: same formula, only these municipalities
+model1b = smf.ols(formula, data=data_sa).fit()
+
+# Model 2: model 1b + social assistance rate
+model2 = smf.ols(formula + " + social_assistance_rate", data=data_sa).fit()
+print(model2.summary())
+
+
+# Comparison table of all three models
+comparison = pd.DataFrame({
+    "Model 1": model1.params,
+    "Model 1b": model1b.params,
+    "Model 2": model2.params,
+})
+comparison.loc["R-squared"] = [model1.rsquared,
+                               model1b.rsquared, model2.rsquared]
+comparison.loc["N"] = [model1.nobs, model1b.nobs, model2.nobs]
+
+comparison = comparison.round(3)
+comparison.to_csv(PATH + "figures/model_comparison.csv")
+comparison
+# look at log population density --> effect is have as big --> selection bias results cant be used
+ 

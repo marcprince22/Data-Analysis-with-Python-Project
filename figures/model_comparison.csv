@@ -1,0 +1,15 @@
+,Model 1,Model 1b,Model 2
+Intercept,34.827,33.452,32.639
+compulsory_voting,19.976,19.76,19.625
+income_gini_100,0.109,0.1,0.1
+income_median_1000,0.064,0.065,0.051
+log_population,-0.483,-0.245,-0.228
+log_population_density,-0.681,-0.753,-0.579
+share_age_0_19,0.062,0.059,0.101
+share_age_65plus,0.103,0.109,0.139
+share_foreign,-0.055,-0.054,-0.039
+share_primary_sector,0.008,0.012,0.015
+share_tertiary,0.312,0.314,0.299
+social_assistance_rate,,,-0.338
+R-squared,0.614,0.62,0.627
+N,1966.0,1601.0,1601.0
