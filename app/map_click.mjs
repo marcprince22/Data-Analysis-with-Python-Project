@@ -30,6 +30,11 @@ export default function ({ data, setStateValue }) {
         setStateValue("municipality", id);
     }
 
+    function changeYear({ name }) {
+        const year = Number(name);
+        if (Number.isInteger(year)) setStateValue("year", year);
+    }
+
     function connect() {
         graph = document.querySelector(selector);
         if (typeof graph?.on !== "function") return;
@@ -46,6 +51,12 @@ export default function ({ data, setStateValue }) {
         document.addEventListener("pointercancel", () => { press = undefined; }, options);
         graph.on("plotly_click", selectMunicipality);
         graph.on("plotly_afterplot", markSelection);
+        if (data.timeline) {
+            // Plotly's "fromcurrent" reads the last frame, not the initial slider position.
+            const slider = graph._fullLayout.sliders[0];
+            graph._fullLayout._currentFrame ??= slider.steps[slider.active].label;
+            graph.on("plotly_animatingframe", changeYear);
+        }
         markSelection();
     }
 
@@ -58,5 +69,6 @@ export default function ({ data, setStateValue }) {
         listeners.abort();
         graph?.removeListener?.("plotly_click", selectMunicipality);
         graph?.removeListener?.("plotly_afterplot", markSelection);
+        if (data.timeline) graph?.removeListener?.("plotly_animatingframe", changeYear);
     };
 }
