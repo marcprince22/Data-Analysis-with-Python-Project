@@ -5,6 +5,7 @@ import pandas as pd
 import statsmodels.api as sm
 from statsmodels.nonparametric.smoothers_lowess import lowess
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+import statsmodels.formula.api as smf
 
 PATH = "../../"
 
